@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Survei Kepuasan Layanan BK - MTsN 1 Kota Makassar</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts Inter & Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js for Admin Analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        heading: ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                        },
+                        emeraldTheme: {
+                            light: '#059669',
+                            DEFAULT: '#047857',
+                            dark: '#065f46',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Poppins', sans-serif;
+        }
+        .custom-gradient {
+            background: linear-gradient(135deg, #065f46 0%, #047857 50%, #059669 100%);
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 25px -5px rgba(4, 120, 87, 0.15), 0 8px 10px -6px rgba(4, 120, 87, 0.1);
+        }
+        /* Custom radio styling */
+        .rating-radio:checked + span {
+            background-color: #047857;
+            color: white;
+            border-color: #047857;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 flex flex-col min-h-full">
+
+    <!-- Navbar -->
+    <header class="bg-white shadow-sm sticky top-0 z-50 border-b border-emerald-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchView('home')">
+                <div class="flex items-center space-x-2 mr-2">
+                    <div class="w-10 h-10 rounded-full bg-emerald-700 flex items-center justify-center text-white shadow-md border-2 border-white">
+                        <i class="fa-solid fa-hands-holding-child text-xl"></i>
+                    </div>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg text-emerald-900 leading-tight">CIKA BK MTsN 1</h1>
+                    <p class="text-xs text-gray-500 font-medium">Kota Makassar</p>
+                </div>
+            </div>
+            
+            <nav class="hidden md:flex items-center space-x-6 font-medium text-sm">
+                <button onclick="switchView('home')" class="text-gray-600 hover:text-emerald-700 transition">Beranda</button>
+                <button onclick="switchView('survey-selection')" class="text-gray-600 hover:text-emerald-700 transition">Isi Survei</button>
+                <button onclick="switchView('stats')" class="text-gray-600 hover:text-emerald-700 transition">Hasil Survei</button>
+                <button onclick="openAdminModal()" class="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 px-4 py-2 rounded-lg font-semibold transition border border-emerald-200 flex items-center gap-2">
+                    <i class="fa-solid fa-lock text-xs"></i> Admin Panel
+                </button>
+            </nav>
+
+            <!-- Mobile menu button -->
+            <div class="md:hidden flex items-center gap-2">
+                <button onclick="openAdminModal()" class="bg-emerald-50 text-emerald-700 p-2.5 rounded-lg text-sm font-semibold border border-emerald-200">
+                    <i class="fa-solid fa-lock"></i>
+                </button>
+                <button onclick="toggleMobileMenu()" class="text-gray-600 hover:text-emerald-700 p-2">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Dropdown -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-b px-4 pt-2 pb-4 space-y-2">
+            <button onclick="switchView('home'); toggleMobileMenu()" class="block w-full text-left py-2 text-gray-700 font-medium">Beranda</button>
+            <button onclick="switchView('survey-selection'); toggleMobileMenu()" class="block w-full text-left py-2 text-gray-700 font-medium">Isi Survei</button>
+            <button onclick="switchView('stats'); toggleMobileMenu()" class="block w-full text-left py-2 text-gray-700 font-medium">Hasil & Grafik</button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow">
+
+        <!-- VIEW 1: HOME -->
+        <section id="view-home" class="py-12 md:py-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <!-- Hero Banner -->
+                <div class="custom-gradient rounded-3xl p-8 md:p-14 text-white shadow-xl relative overflow-hidden mb-16">
+                    <div class="absolute -right-10 -bottom-10 opacity-10 text-9xl">
+                        <i class="fa-solid fa-school"></i>
+                    </div>
+                    <div class="max-w-3xl relative z-10">
+                        <div class="flex items-center space-x-3 mb-6">
+                            <div class="w-12 h-12 rounded-full bg-emerald-800/80 flex items-center justify-center text-white shadow-sm border border-white/20">
+                                <i class="fa-solid fa-hands-holding-child text-2xl"></i>
+                            </div>
+                        </div>
+                        <span class="bg-emerald-600 text-emerald-50 text-xs font-semibold px-3 py-1.5 rounded-full uppercase tracking-wider mb-4 inline-block">
+                            E-Kinerja & Layanan Bimbingan Konseling
+                        </span>
+                        <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight mb-4 leading-tight">
+                            CIKA: Cek Indeks Kepuasan & Aspirasi Layanan BK
+                        </h1>
+                        <p class="text-emerald-100 text-base md:text-lg mb-8 leading-relaxed font-light">
+                            Selamat datang di portal resmi evaluasi Bimbingan Konseling <strong class="text-white font-semibold">MTsN 1 Kota Makassar</strong>. Partisipasi Anda sangat berharga untuk meningkatkan kualitas pendampingan psikologis, akademik, dan karier siswa.
+                        </p>
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <button onclick="switchView('survey-selection')" class="bg-white text-emerald-800 hover:bg-emerald-50 font-bold px-8 py-4 rounded-xl shadow-lg transition duration-200 flex items-center justify-center gap-3 text-base">
+                                <i class="fa-solid fa-clipboard-check text-emerald-600"></i> Mulai Mengisi Survei
+                            </button>
+                            <button onclick="switchView('stats')" class="bg-emerald-800/60 hover:bg-emerald-800 text-white font-semibold px-6 py-4 rounded-xl border border-emerald-500/50 transition duration-200 flex items-center justify-center gap-3 text-base">
+                                <i class="fa-solid fa-chart-pie"></i> Lihat Hasil Survei
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Info Cards Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+                    <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 card-hover">
+                        <div class="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl mb-6">
+                            <i class="fa-solid fa-user-graduate"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-3">Untuk Siswa / Siswi</h3>
+                        <p class="text-gray-600 text-sm leading-relaxed mb-4">
+                            Nilai kepuasan layanan konseling pribadi, sosial, belajar, maupun karier yang telah Anda terima dari guru BK MTsN 1 Makassar.
+                        </p>
+                        <button onclick="startSurvey('siswa')" class="text-emerald-700 font-semibold text-sm hover:text-emerald-800 flex items-center gap-2">
+                            Isi Survei Siswa <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </button>
+                    </div>
+
+                    <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 card-hover">
+                        <div class="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl mb-6">
+                            <i class="fa-solid fa-user-group"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-3">Untuk Orang Tua / Wali</h3>
+                        <p class="text-gray-600 text-sm leading-relaxed mb-4">
+                            Sampaikan penilaian dan masukan Anda mengenai keterbukaan informasi, bimbingan akhlak, dan perkembangan mental anak di madrasah.
+                        </p>
+                        <button onclick="startSurvey('orangtua')" class="text-emerald-700 font-semibold text-sm hover:text-emerald-800 flex items-center gap-2">
+                            Isi Survei Orang Tua <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </button>
+                    </div>
+
+                    <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 card-hover">
+                        <div class="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl mb-6">
+                            <i class="fa-solid fa-shield-halved"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-3">Kerahasiaan Terjamin</h3>
+                        <p class="text-gray-600 text-sm leading-relaxed mb-4">
+                            Seluruh data responden dan jawaban dijamin kerahasiaannya dan murni digunakan untuk evaluasi mutu layanan Bimbingan Konseling MTsN 1 Makassar.
+                        </p>
+                        <span class="text-xs text-emerald-600 font-semibold bg-emerald-50 px-3 py-1 rounded-full inline-block">100% Aman & Anonim</span>
+                    </div>
+                </div>
+
+                <!-- About School Banner -->
+                <div class="bg-white rounded-3xl p-8 md:p-12 border border-emerald-100 flex flex-col md:flex-row items-center justify-between gap-8">
+                    <div class="space-y-3">
+                        <span class="text-emerald-600 font-semibold text-xs tracking-wider uppercase">Madrasah Tsanawiyah Negeri 1</span>
+                        <h2 class="text-2xl md:text-3xl font-bold text-gray-900">Mewujudkan Generasi Unggul, Berkarakter & Berprestasi</h2>
+                        <p class="text-gray-600 max-w-2xl text-sm leading-relaxed">
+                            Layanan Bimbingan Konseling MTsN 1 Kota Makassar berkomitmen mendampingi peserta didik agar memiliki kematangan emosional, sosial, dan sukses dalam studi lanjut.
+                        </p>
+                    </div>
+                    <div class="flex-shrink-0">
+                        <button onclick="switchView('survey-selection')" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-6 py-3.5 rounded-xl shadow-md transition duration-200">
+                            Mulai Survei Sekarang
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 2: SURVEY SELECTION -->
+        <section id="view-survey-selection" class="py-16 hidden">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <span class="text-emerald-600 font-semibold text-xs tracking-wider uppercase bg-emerald-50 px-3 py-1 rounded-full">Pilih Kategori Responden</span>
+                    <h2 class="text-3xl font-bold text-gray-900 mt-3 mb-2">Siapa Anda?</h2>
+                    <p class="text-gray-600 text-sm">Silakan pilih kategori di bawah ini sesuai dengan posisi Anda dalam civitas akademika MTsN 1 Kota Makassar.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div onclick="startSurvey('siswa')" class="bg-white p-8 rounded-2xl border-2 border-emerald-100 hover:border-emerald-600 cursor-pointer shadow-sm hover:shadow-md transition group text-center">
+                        <div class="w-20 h-20 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center text-3xl mx-auto mb-6 group-hover:bg-emerald-700 group-hover:text-white transition">
+                            <i class="fa-solid fa-user-graduate"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-900 mb-2">Siswa / Siswi</h3>
+                        <p class="text-gray-600 text-sm mb-6">
+                            Formulir khusus bagi siswa MTsN 1 Makassar yang pernah atau sedang mengikuti sesi layanan bimbingan konseling.
+                        </p>
+                        <span class="inline-flex items-center gap-2 text-emerald-700 font-semibold group-hover:underline">
+                            Pilih Kategori Siswa <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </span>
+                    </div>
+
+                    <div onclick="startSurvey('orangtua')" class="bg-white p-8 rounded-2xl border-2 border-emerald-100 hover:border-emerald-600 cursor-pointer shadow-sm hover:shadow-md transition group text-center">
+                        <div class="w-20 h-20 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center text-3xl mx-auto mb-6 group-hover:bg-emerald-700 group-hover:text-white transition">
+                            <i class="fa-solid fa-user-group"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-900 mb-2">Orang Tua / Wali Murid</h3>
+                        <p class="text-gray-600 text-sm mb-6">
+                            Formulir evaluasi bagi orang tua siswa MTsN 1 Makassar terhadap pelayanan dan komunikasi pihak BK sekolah.
+                        </p>
+                        <span class="inline-flex items-center gap-2 text-emerald-700 font-semibold group-hover:underline">
+                            Pilih Kategori Orang Tua <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="mt-10 text-center">
+                    <button onclick="switchView('home')" class="text-gray-500 hover:text-gray-800 text-sm font-medium">
+                        <i class="fa-solid fa-arrow-left mr-1"></i> Kembali ke Beranda
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 3: SURVEY FORM -->
+        <section id="view-survey-form" class="py-12 hidden">
+            <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+                <!-- Progress Header -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8">
+                    <div class="flex items-center justify-between mb-3">
+                        <h2 id="form-title" class="text-xl font-bold text-gray-900">Formulir Survei Kepuasan BK</h2>
+                        <span id="form-badge" class="bg-emerald-100 text-emerald-800 text-xs font-semibold px-3 py-1 rounded-full">Siswa</span>
+                    </div>
+                    <p class="text-gray-500 text-xs mb-4">MTsN 1 Kota Makassar - Silakan isi identitas singkat dan berikan penilaian jujur Anda.</p>
+                    <div class="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
+                        <div id="form-progress-bar" class="bg-emerald-600 h-full w-1/2 transition-all duration-300"></div>
+                    </div>
+                </div>
+
+                <!-- Survey Form Element -->
+                <form id="bk-survey-form" onsubmit="submitSurvey(event)" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 space-y-8">
+                    <!-- Respondent Info -->
+                    <div class="space-y-4 pb-6 border-b border-gray-100">
+                        <h3 class="text-base font-bold text-gray-900 flex items-center gap-2">
+                            <i class="fa-solid fa-id-card text-emerald-600"></i> Informasi Responden
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-700 mb-1">Nama Lengkap *</label>
+                                <input type="text" id="resp-name" required placeholder="Masukkan nama lengkap" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm">
+                            </div>
+                            <div id="field-container-class">
+                                <label class="block text-xs font-semibold text-gray-700 mb-1" id="label-class-grade">Kelas / Tingkat *</label>
+                                <select id="resp-class" required class="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm bg-white">
+                                    <option value="">-- Pilih Kelas --</option>
+                                    <option value="Kelas 7">Kelas 7</option>
+                                    <option value="Kelas 8">Kelas 8</option>
+                                    <option value="Kelas 9">Kelas 9</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Questions Container -->
+                    <div id="questions-container" class="space-y-8">
+                        <!-- Questions will be injected dynamically via JS -->
+                    </div>
+
+                    <!-- Suggestions / Comments -->
+                    <div class="space-y-2 pt-4 border-t border-gray-100">
+                        <label class="block text-sm font-bold text-gray-900">Kritik, Saran, atau Testimoni Layanan BK</label>
+                        <textarea id="resp-feedback" rows="4" placeholder="Tuliskan masukan Anda untuk kemajuan layanan BK MTsN 1 Kota Makassar..." class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm"></textarea>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="flex items-center justify-between pt-4">
+                        <button type="button" onclick="switchView('survey-selection')" class="text-gray-500 hover:text-gray-700 text-sm font-medium">
+                            <i class="fa-solid fa-arrow-left mr-1"></i> Batal
+                        </button>
+                        <button type="submit" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-8 py-3.5 rounded-xl shadow-md transition flex items-center gap-2">
+                            <i class="fa-solid fa-paper-plane"></i> Kirim Penilaian
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- VIEW 4: SUCCESS MODAL/VIEW -->
+        <section id="view-success" class="py-20 hidden">
+            <div class="max-w-md mx-auto px-4 text-center">
+                <div class="w-24 h-24 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-4xl mx-auto mb-6 shadow-sm">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+                <h2 class="text-3xl font-bold text-gray-900 mb-3">Terima Kasih!</h2>
+                <p class="text-gray-600 text-sm mb-8 leading-relaxed">
+                    Responden yang terhormat, penilaian dan masukan Anda telah berhasil direkam dalam sistem CIKA BK MTsN 1 Kota Makassar. Kontribusi Anda sangat berarti bagi peningkatan kualitas madrasah kita tercinta.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                    <button onclick="switchView('stats')" class="bg-emerald-700 hover:bg-emerald-800 text-white font-semibold px-6 py-3 rounded-xl text-sm shadow">
+                        Lihat Hasil Survei
+                    </button>
+                    <button onclick="switchView('home')" class="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold px-6 py-3 rounded-xl text-sm">
+                        Kembali ke Beranda
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 5: STATS & CHARTS VIEW -->
+        <section id="view-stats" class="py-12 hidden">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <!-- Header -->
+                <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+                    <div>
+                        <span class="text-emerald-600 font-semibold text-xs tracking-wider uppercase bg-emerald-50 px-3 py-1 rounded-full">Transparansi Kinerja</span>
+                        <h2 class="text-3xl font-bold text-gray-900 mt-2">Hasil Survei Kepuasan BK</h2>
+                        <p class="text-gray-600 text-sm">Akumulasi penilaian langsung dari siswa dan orang tua MTsN 1 Kota Makassar.</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button onclick="exportData()" class="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 shadow-sm">
+                            <i class="fa-solid fa-download text-emerald-600"></i> Ekspor CSV
+                        </button>
+                        <button onclick="switchView('home')" class="bg-emerald-700 hover:bg-emerald-800 text-white px-4 py-2.5 rounded-xl text-sm font-semibold">
+                            Beranda
+                        </button>
+                    </div>
+                </div>
+
+                <!-- KPI Cards Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-xs font-semibold text-gray-500 uppercase">Indeks Kepuasan BK</span>
+                            <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
+                                <i class="fa-solid fa-star"></i>
+                            </div>
+                        </div>
+                        <h3 id="stat-index-score" class="text-3xl font-extrabold text-gray-900 mb-1">4.8 / 5.0</h3>
+                        <p class="text-xs text-emerald-600 font-medium">Sangat Memuaskan</p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-xs font-semibold text-gray-500 uppercase">Total Responden</span>
+                            <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
+                                <i class="fa-solid fa-users"></i>
+                            </div>
+                        </div>
+                        <h3 id="stat-total-resp" class="text-3xl font-extrabold text-gray-900 mb-1">0</h3>
+                        <p class="text-xs text-blue-600 font-medium">Siswa & Orang Tua</p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-xs font-semibold text-gray-500 uppercase">Responden Siswa</span>
+                            <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold">
+                                <i class="fa-solid fa-user-graduate"></i>
+                            </div>
+                        </div>
+                        <h3 id="stat-siswa-resp" class="text-3xl font-extrabold text-gray-900 mb-1">0</h3>
+                        <p class="text-xs text-amber-600 font-medium">Partisipasi Aktif</p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-xs font-semibold text-gray-500 uppercase">Responden Orang Tua</span>
+                            <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center font-bold">
+                                <i class="fa-solid fa-user-group"></i>
+                            </div>
+                        </div>
+                        <h3 id="stat-parent-resp" class="text-3xl font-extrabold text-gray-900 mb-1">0</h3>
+                        <p class="text-xs text-purple-600 font-medium">Dukungan Wali Murid</p>
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                        <h3 class="text-lg font-bold text-gray-900 mb-4">Distribusi Penilaian per Aspek (Skala 1-4)</h3>
+                        <div class="h-72 flex items-center justify-center">
+                            <canvas id="aspectChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                        <h3 class="text-lg font-bold text-gray-900 mb-4">Perbandingan Responden Siswa vs Orang Tua</h3>
+                        <div class="h-72 flex items-center justify-center">
+                            <canvas id="categoryChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Testimonials / Feedback List -->
+                <div class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+                    <h3 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                        <i class="fa-solid fa-comments text-emerald-600"></i> Masukan & Testimoni Terbaru
+                    </h3>
+                    <div id="feedback-list" class="space-y-4">
+                        <!-- Injected via JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Admin Login Modal -->
+    <div id="admin-modal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden px-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-8 shadow-2xl relative">
+            <button onclick="closeAdminModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center text-2xl mx-auto mb-4">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900">Login Administrator BK</h3>
+                <p class="text-gray-500 text-xs mt-1">Masukkan PIN akses untuk mengelola data survei MTsN 1 Makassar.</p>
+            </div>
+            <form onsubmit="handleAdminLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 mb-1">PIN Akses Admin</label>
+                    <input type="password" id="admin-pin" required placeholder="Masukkan PIN (default: 1234)" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm">
+                </div>
+                <button type="submit" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-3 rounded-xl shadow transition text-sm">
+                    Masuk ke Panel
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Management Modal / View -->
+    <div id="admin-panel-modal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden px-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl max-w-4xl w-full p-8 shadow-2xl relative my-8 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between pb-4 border-b mb-6">
+                <div>
+                    <h3 class="text-xl font-bold text-gray-900">Panel Kontrol Administrator</h3>
+                    <p class="text-xs text-gray-500">Kelola dan reset data survei kepuasan BK MTsN 1 Kota Makassar</p>
+                </div>
+                <button onclick="closeAdminPanel()" class="text-gray-400 hover:text-gray-600 p-2">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+
+            <div class="space-y-6">
+                <div class="flex flex-wrap gap-4 items-center justify-between bg-emerald-50 p-4 rounded-xl border border-emerald-100">
+                    <div>
+                        <h4 class="font-bold text-emerald-900 text-sm">Aksi Data Responden</h4>
+                        <p class="text-xs text-emerald-700">Unduh data atau bersihkan riwayat jika diperlukan.</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="exportData()" class="bg-white text-emerald-800 border border-emerald-300 hover:bg-emerald-100 font-semibold px-4 py-2 rounded-lg text-xs flex items-center gap-1.5">
+                            <i class="fa-solid fa-download"></i> Ekspor CSV
+                        </button>
+                        <button onclick="resetData()" class="bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded-lg text-xs flex items-center gap-1.5">
+                            <i class="fa-solid fa-trash"></i> Reset Semua Data
+                        </button>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="font-bold text-gray-900 text-sm mb-3">Daftar Responden Masuk (<span id="admin-total-count">0</span>)</h4>
+                    <div class="overflow-x-auto border border-gray-200 rounded-xl">
+                        <table class="w-full text-left text-xs text-gray-600">
+                            <thead class="bg-gray-100 text-gray-700 uppercase font-semibold">
+                                <tr>
+                                    <th class="p-3">Waktu</th>
+                                    <th class="p-3">Nama</th>
+                                    <th class="p-3">Kategori</th>
+                                    <th class="p-3">Kelas/Status</th>
+                                    <th class="p-3 text-center">Rata-rata Skor</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-table-body" class="divide-y divide-gray-200">
+                                <!-- Injected via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-400 py-12 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="flex items-center space-x-3">
+                <div class="flex items-center space-x-2 mr-1">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-700/80 flex items-center justify-center text-white">
+                        <i class="fa-solid fa-hands-holding-child"></i>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="font-bold text-white text-sm">MTsN 1 Kota Makassar</h4>
+                    <p class="text-xs text-gray-400">Layanan Bimbingan Konseling (CIKA)</p>
+                </div>
+            </div>
+            <p class="text-xs text-center md:text-right">
+                &copy; 2026 MTsN 1 Kota Makassar. All rights reserved. <br>
+                <span class="text-emerald-500 font-medium">Membangun Generasi Cerdas & Berakhlak Mulia</span>
+            </p>
+        </div>
+    </footer>
+
+    <!-- Application JavaScript Logic -->
+    <script>
+        // Survey Questions definition for Siswa & Orang Tua
+        const questionsData = {
+            siswa: [
+                { id: 'q1', text: '1. Kemudahan guru BK dalam dihubungi atau ditemui saat jam istirahat/konsultasi.' },
+                { id: 'q2', text: '2. Keramahan dan sikap empati guru BK dalam mendengarkan curhat/masalah siswa.' },
+                { id: 'q3', text: '3. Keefektifan bimbingan belajar, motivasi, dan manajemen stres yang diberikan guru BK.' },
+                { id: 'q4', text: '4. Kerahasiaan masalah pribadi atau masalah sosial siswa terjaga dengan sangat baik.' },
+                { id: 'q5', text: '5. Manfaat layanan informasi karier dan persiapan studi lanjut (ke MAN / SMA unggulan).' }
+            ],
+            orangtua: [
+                { id: 'q1', text: '1. Keterbukaan informasi dan komunikasi antara pihak guru BK dengan orang tua siswa.' },
+                { id: 'q2', text: '2. Responsivitas guru BK dalam menangani laporan atau konsultasi dari orang tua.' },
+                { id: 'q3', text: '3. Peran BK dalam membantu pembentukan karakter, akhlak mulia, dan disiplin anak di madrasah.' },
+                { id: 'q4', text: '4. Efektivitas pendampingan psikologis dan perkembangan sosial anak selama di MTsN 1 Makassar.' },
+                { id: 'q5', text: '5. Kepuasan umum terhadap kualitas layanan bimbingan konseling secara keseluruhan.' }
+            ]
+        };
+
+        // Default initial dummy responses if localStorage is empty
+        const defaultResponses = [
+            {
+                name: "Ahmad Fauzan",
+                category: "siswa",
+                classGrade: "Kelas 8",
+                ratings: { q1: 4, q2: 4, q3: 5, q4: 4, q5: 5 },
+                feedback: "Guru BK sangat ramah dan membantu saat saya merasa kesulitan belajar.",
+                timestamp: "2026-06-01 10:30"
+            },
+            {
+                name: "Siti Aminah",
+                category: "orangtua",
+                classGrade: "Orang Tua - Kelas 9",
+                ratings: { q1: 5, q2: 4, q3: 5, q4: 5, q5: 4 },
+                feedback: "Komunikasi dengan orang tua sangat baik. Anak kami lebih termotivasi.",
+                timestamp: "2026-06-02 14:15"
+            }
+        ];
+
+        let currentSurveyType = 'siswa';
+        let aspectChartInstance = null;
+        let categoryChartInstance = null;
+
+        // Load responses from LocalStorage or initialize defaults
+        function getStoredResponses() {
+            const data = localStorage.getItem('cika_bk_responses');
+            if (!data) {
+                localStorage.setItem('cika_bk_responses', JSON.stringify(defaultResponses));
+                return defaultResponses;
+            }
+            return JSON.parse(data);
+        }
+
+        function saveResponses(responses) {
+            localStorage.setItem('cika_bk_responses', JSON.stringify(responses));
+        }
+
+        // Navigation Switcher
+        function switchView(viewId) {
+            const views = ['home', 'survey-selection', 'survey-form', 'success', 'stats'];
+            views.forEach(v => {
+                const el = document.getElementById(`view-${v}`);
+                if (el) {
+                    if (v === viewId) {
+                        el.classList.remove('hidden');
+                    } else {
+                        el.classList.add('hidden');
+                    }
+                }
+            });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            if (viewId === 'stats') {
+                renderStatsAndCharts();
+            }
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        // Start Survey based on category
+        function startSurvey(type) {
+            currentSurveyType = type;
+            switchView('survey-form');
+
+            const formBadge = document.getElementById('form-badge');
+            const formTitle = document.getElementById('form-title');
+            const labelClassGrade = document.getElementById('label-class-grade');
+            const selectClass = document.getElementById('resp-class');
+
+            if (type === 'siswa') {
+                formBadge.textContent = "Siswa / Siswi";
+                formBadge.className = "bg-amber-100 text-amber-800 text-xs font-semibold px-3 py-1 rounded-full";
+                formTitle.textContent = "Survei Kepuasan Siswa - Layanan BK";
+                labelClassGrade.textContent = "Kelas Siswa *";
+                selectClass.innerHTML = `
+                    <option value="">-- Pilih Kelas --</option>
+                    <option value="Kelas 7">Kelas 7</option>
+                    <option value="Kelas 8">Kelas 8</option>
+                    <option value="Kelas 9">Kelas 9</option>
+                `;
+            } else {
+                formBadge.textContent = "Orang Tua / Wali";
+                formBadge.className = "bg-purple-100 text-purple-800 text-xs font-semibold px-3 py-1 rounded-full";
+                formTitle.textContent = "Survei Kepuasan Orang Tua - Layanan BK";
+                labelClassGrade.textContent = "Tingkat Kelas Anak *";
+                selectClass.innerHTML = `
+                    <option value="">-- Pilih Kelas Anak --</option>
+                    <option value="Orang Tua - Kelas 7">Anak di Kelas 7</option>
+                    <option value="Orang Tua - Kelas 8">Anak di Kelas 8</option>
+                    <option value="Orang Tua - Kelas 9">Anak di Kelas 9</option>
+                `;
+            }
+
+            renderQuestions(type);
+        }
+
+        // Render dynamic survey questions with Likert scale 1-5
+        function renderQuestions(type) {
+            const container = document.getElementById('questions-container');
+            const questions = questionsData[type];
+            let html = '';
+
+            questions.forEach((q, index) => {
+                html += `
+                    <div class="p-5 rounded-2xl bg-gray-50 border border-gray-200/80 space-y-3">
+                        <label class="block text-sm font-bold text-gray-900">${q.text}</label>
+                        <div class="grid grid-cols-5 gap-2 pt-1">
+                            <label class="cursor-pointer text-center">
+                                <input type="radio" name="${q.id}" value="1" required class="sr-only rating-radio">
+                                <span class="block py-2.5 px-1 rounded-xl border border-gray-300 text-xs font-medium text-gray-700 bg-white hover:bg-emerald-50 transition">1<br><span class="text-[10px] text-gray-400 font-normal">STS</span></span>
+                            </label>
+                            <label class="cursor-pointer text-center">
+                                <input type="radio" name="${q.id}" value="2" class="sr-only rating-radio">
+                                <span class="block py-2.5 px-1 rounded-xl border border-gray-300 text-xs font-medium text-gray-700 bg-white hover:bg-emerald-50 transition">2<br><span class="text-[10px] text-gray-400 font-normal">TS</span></span>
+                            </label>
+                            <label class="cursor-pointer text-center">
+                                <input type="radio" name="${q.id}" value="3" class="sr-only rating-radio">
+                                <span class="block py-2.5 px-1 rounded-xl border border-gray-300 text-xs font-medium text-gray-700 bg-white hover:bg-emerald-50 transition">3<br><span class="text-[10px] text-gray-400 font-normal">N</span></span>
+                            </label>
+                            <label class="cursor-pointer text-center">
+                                <input type="radio" name="${q.id}" value="4" class="sr-only rating-radio">
+                                <span class="block py-2.5 px-1 rounded-xl border border-gray-300 text-xs font-medium text-gray-700 bg-white hover:bg-emerald-50 transition">4<br><span class="text-[10px] text-gray-400 font-normal">S</span></span>
+                            </label>
+                            <label class="cursor-pointer text-center">
+                                <input type="radio" name="${q.id}" value="5" class="sr-only rating-radio">
+                                <span class="block py-2.5 px-1 rounded-xl border border-gray-300 text-xs font-medium text-gray-700 bg-white hover:bg-emerald-50 transition">5<br><span class="text-[10px] text-gray-400 font-normal">SS</span></span>
+                            </label>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // Submit Survey Handler
+        function submitSurvey(e) {
+            e.preventDefault();
+            const name = document.getElementById('resp-name').value;
+            const classGrade = document.getElementById('resp-class').value;
+            const feedback = document.getElementById('resp-feedback').value;
+
+            const ratings = {};
+            const questions = questionsData[currentSurveyType];
+            questions.forEach(q => {
+                const selected = document.querySelector(`input[name="${q.id}"]:checked`);
+                ratings[q.id] = selected ? parseInt(selected.value) : 5;
+            });
+
+            const now = new Date();
+            const timestamp = now.toISOString().slice(0, 16).replace('T', ' ');
+
+            const newEntry = {
+                name,
+                category: currentSurveyType,
+                classGrade,
+                ratings,
+                feedback,
+                timestamp
+            };
+
+            const responses = getStoredResponses();
+            responses.unshift(newEntry);
+            saveResponses(responses);
+
+            document.getElementById('bk-survey-form').reset();
+            switchView('success');
+        }
+
+        // Render Stats & Charts
+        function renderStatsAndCharts() {
+            const responses = getStoredResponses();
+            const totalResp = responses.length;
+            const siswaResp = responses.filter(r => r.category === 'siswa').length;
+            const parentResp = responses.filter(r => r.category === 'orangtua').length;
+
+            // Calculate overall index score (average of all ratings)
+            let totalSum = 0;
+            let totalCount = 0;
+            responses.forEach(r => {
+                Object.values(r.ratings).forEach(val => {
+                    totalSum += val;
+                    totalCount++;
+                });
+            });
+
+            const indexScore = totalCount > 0 ? (totalSum / totalCount).toFixed(1) : "0.0";
+
+            document.getElementById('stat-total-resp').textContent = totalResp;
+            document.getElementById('stat-siswa-resp').textContent = siswaResp;
+            document.getElementById('stat-parent-resp').textContent = parentResp;
+            document.getElementById('stat-index-score').textContent = `${indexScore} / 5.0`;
+
+            // Render Aspect Averages for Chart 1
+            const aspectScores = [0, 0, 0, 0, 0];
+            const aspectCounts = [0, 0, 0, 0, 0];
+
+            responses.forEach(r => {
+                const keys = Object.keys(r.ratings);
+                keys.forEach((k, idx) => {
+                    aspectScores[idx] += r.ratings[k];
+                    aspectCounts[idx]++;
+                });
+            });
+
+            const aspectAverages = aspectScores.map((sum, idx) => aspectCounts[idx] > 0 ? (sum / aspectCounts[idx]).toFixed(2) : 0);
+
+            // Render Chart 1: Aspects Bar Chart
+            const ctxAspect = document.getElementById('aspectChart').getContext('2d');
+            if (aspectChartInstance) aspectChartInstance.destroy();
+
+            aspectChartInstance = new Chart(ctxAspect, {
+                type: 'bar',
+                data: {
+                    labels: ['Aspek 1 (Komunikasi/Akses)', 'Aspek 2 (Empati/Keramahan)', 'Aspek 3 (Bimbingan Belajar/Stres)', 'Aspek 4 (Kerahasiaan/Karakter)', 'Aspek 5 (Karier/Kepuasan Umum)'],
+                    datasets: [{
+                        label: 'Skor Rata-rata',
+                        data: aspectAverages,
+                        backgroundColor: '#047857',
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, max: 5 }
+                    }
+                }
+            });
+
+            // Render Chart 2: Category Doughnut Chart
+            const ctxCat = document.getElementById('categoryChart').getContext('2d');
+            if (categoryChartInstance) categoryChartInstance.destroy();
+
+            categoryChartInstance = new Chart(ctxCat, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Siswa / Siswi', 'Orang Tua / Wali'],
+                    datasets: [{
+                        data: [siswaResp, parentResp],
+                        backgroundColor: ['#059669', '#3b82f6'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+
+            // Render Feedback List
+            const feedbackListEl = document.getElementById('feedback-list');
+            let feedbackHtml = '';
+            const filteredFeedback = responses.filter(r => r.feedback && r.feedback.trim() !== '');
+
+            if (filteredFeedback.length === 0) {
+                feedbackHtml = `<p class="text-gray-400 text-sm italic">Belum ada masukan tertulis.</p>`;
+            } else {
+                filteredFeedback.slice(0, 5).forEach(item => {
+                    feedbackHtml += `
+                        <div class="p-4 rounded-xl bg-gray-50 border border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-2">
+                            <div>
+                                <p class="text-xs font-bold text-gray-900">${item.name} <span class="font-normal text-gray-500">(${item.classGrade})</span></p>
+                                <p class="text-xs text-gray-700 mt-1">"${item.feedback}"</p>
+                            </div>
+                            <span class="text-[10px] text-gray-400 whitespace-nowrap">${item.timestamp}</span>
+                        </div>
+                    `;
+                });
+            }
+            feedbackListEl.innerHTML = feedbackHtml;
+        }
+
+        // Admin Modal Controls
+        function openAdminModal() {
+            document.getElementById('admin-modal').classList.remove('hidden');
+        }
+
+        function closeAdminModal() {
+            document.getElementById('admin-modal').classList.add('hidden');
+            document.getElementById('admin-pin').value = '';
+        }
+
+        function handleAdminLogin(e) {
+            e.preventDefault();
+            const pin = document.getElementById('admin-pin').value;
+            if (pin === '1234' || pin === 'adminbk') {
+                closeAdminModal();
+                openAdminPanel();
+            } else {
+                alert('PIN Salah! Gunakan PIN default: 1234');
+            }
+        }
+
+        function openAdminPanel() {
+            document.getElementById('admin-panel-modal').classList.remove('hidden');
+            renderAdminTable();
+        }
+
+        function closeAdminPanel() {
+            document.getElementById('admin-panel-modal').classList.add('hidden');
+        }
+
+        function renderAdminTable() {
+            const responses = getStoredResponses();
+            document.getElementById('admin-total-count').textContent = responses.length;
+            const tbody = document.getElementById('admin-table-body');
+            let html = '';
+
+            if (responses.length === 0) {
+                html = `<tr><td colspan="5" class="p-4 text-center text-gray-400">Belum ada data survei.</td></tr>`;
+            } else {
+                responses.forEach(r => {
+                    const ratingsArr = Object.values(r.ratings);
+                    const avg = (ratingsArr.reduce((a, b) => a + b, 0) / ratingsArr.length).toFixed(1);
+                    html += `
+                        <tr class="hover:bg-gray-50">
+                            <td class="p-3 text-gray-500">${r.timestamp}</td>
+                            <td class="p-3 font-semibold text-gray-900">${r.name}</td>
+                            <td class="p-3">
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold ${r.category === 'siswa' ? 'bg-amber-100 text-amber-800' : 'bg-purple-100 text-purple-800'}">
+                                    ${r.category.toUpperCase()}
+                                </span>
+                            </td>
+                            <td class="p-3 text-gray-600">${r.classGrade}</td>
+                            <td class="p-3 text-center font-bold text-emerald-700">${avg} / 5.0</td>
+                        </tr>
+                    `;
+                });
+            }
+            tbody.innerHTML = html;
+        }
+
+        function resetData() {
+            if (confirm('Apakah Anda yakin ingin mereset seluruh data survei? Tindakan ini tidak dapat dibatalkan.')) {
+                localStorage.removeItem('cika_bk_responses');
+                renderAdminTable();
+                alert('Data berhasil direset.');
+                closeAdminPanel();
+                switchView('home');
+            }
+        }
+
+        function exportData() {
+            const responses = getStoredResponses();
+            if (responses.length === 0) {
+                alert('Tidak ada data untuk diekspor.');
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,Waktu,Nama,Kategori,Kelas,Feedback,Rata-rata Skor\n";
+            responses.forEach(r => {
+                const ratingsArr = Object.values(r.ratings);
+                const avg = (ratingsArr.reduce((a, b) => a + b, 0) / ratingsArr.length).toFixed(1);
+                const cleanFeedback = (r.feedback || '').replace(/,/g, ' ');
+                csvContent += `${r.timestamp},${r.name},${r.category},${r.classGrade},"${cleanFeedback}",${avg}\n`;
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "data_survei_bk_mtsn1_makassar.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Fallback custom alert without native alert if needed
+        window.alert = function(msg) {
+            // Create custom minimal modal notification or use console log fallback if needed
+            const div = document.createElement('div');
+            div.className = "fixed bottom-5 right-5 bg-gray-900 text-white px-6 py-3 rounded-xl shadow-xl z-50 text-sm font-medium animate-bounce";
+            div.textContent = msg;
+            document.body.appendChild(div);
+            setTimeout(() => div.remove(), 3500);
+        };
+    </script>
+</body>
+</html>
